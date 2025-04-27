@@ -108,6 +108,18 @@ kubectl --namespace langfuse delete pod langfuse-clickhouse-shard0-{0,1,2} langf
 Afterward, your installation should become fully available.
 Navigate to your domain, e.g. langfuse.example.com, to access the Langfuse UI.
 
+
+### Additional config to view pods in eks
+reference to `https://stackoverflow.com/questions/70787520/your-current-user-or-role-does-not-have-access-to-kubernetes-objects-on-this-eks`
+1. enter `kubectl edit configmap aws-auth -n kube-system` in awscli
+2. Then go down to mapUsers and add the following (replace [account_id] with your Account ID and [username] with your username):
+```json
+mapUsers: |
+  - userarn: arn:aws:iam::[account_id]:user/[username]
+    groups:
+    - system:masters
+```
+
 ## Architecture
 
 ![lanfuse-v3-on-aws](./images/langfuse-v3-on-aws.svg)
