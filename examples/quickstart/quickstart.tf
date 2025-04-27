@@ -12,7 +12,7 @@ module "langfuse" {
 
   # Optional: Configure the VPC
   vpc_cidr               = "10.0.0.0/16"
-  use_single_nat_gateway = false # Using a single NAT gateway decreases costs, but is less resilient
+  use_single_nat_gateway = true # Using a single NAT gateway decreases costs, but is less resilient
 
   # Optional: Configure the Kubernetes cluster
   kubernetes_version         = "1.32"
