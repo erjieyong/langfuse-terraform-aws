@@ -35,6 +35,13 @@ clickhouse:
   auth:
     existingSecret: langfuse
     existingSecretKey: clickhouse-password
+  resources:
+    requests:
+      cpu: "1"
+      memory: "3Gi"
+    limits:
+      cpu: "8"
+      memory: "16Gi"
 redis:
   deploy: false
   host: ${aws_elasticache_replication_group.redis.primary_endpoint_address}
