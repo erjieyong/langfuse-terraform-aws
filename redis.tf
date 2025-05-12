@@ -14,7 +14,9 @@ resource "aws_security_group" "redis" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    # Only allow outbound traffic within the VPC
+    cidr_blocks = [module.vpc.vpc_cidr_block]
+    description = "Allow all outbound traffic within the VPC"
   }
 
   tags = {

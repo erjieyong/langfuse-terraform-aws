@@ -98,14 +98,60 @@ resource "aws_security_group" "eks" {
   }
 }
 
-resource "aws_security_group_rule" "eks_egress" {
+# Remove the existing overly permissive egress rule
+# resource "aws_security_group_rule" "eks_egress" {
+#   type              = "egress"
+#   from_port         = 0
+#   to_port           = 0
+#   protocol          = "-1"
+#   cidr_blocks       = ["0.0.0.0/0"]
+#   security_group_id = aws_security_group.eks.id
+# }
+
+# 1 Allow HTTPS outbound to all IPv4
+resource "aws_security_group_rule" "eks_egress_https_all_ipv4" {
   type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.eks.id
+  description       = "Allow HTTPS outbound to all IPv4"
 }
+
+# 2 Allow HTTP outbound to all IPv4
+resource "aws_security_group_rule" "eks_egress_http_all_ipv4" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.eks.id
+  description       = "Allow HTTP outbound to all IPv4"
+}
+
+# 3 Allow all traffic to its own Cluster security group
+resource "aws_security_group_rule" "eks_egress_self" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1" # All protocols
+  source_security_group_id = aws_security_group.eks.id # Allows traffic to itself
+  security_group_id        = aws_security_group.eks.id
+  description              = "Allow all outbound traffic to self (cluster SG)"
+}
+
+# 4 Allow all traffic to its own vpc
+resource "aws_security_group_rule" "eks_egress_self_vpc" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  cidr_blocks              = [module.vpc.vpc_cidr_block]
+  security_group_id        = aws_security_group.eks.id
+  description              = "Allow all outbound traffic to self vpc"
+}
+
 
 resource "aws_security_group_rule" "eks_vpc" {
   type              = "ingress"
@@ -114,6 +160,17 @@ resource "aws_security_group_rule" "eks_vpc" {
   protocol          = "tcp"
   cidr_blocks       = [module.vpc.vpc_cidr_block]
   security_group_id = aws_security_group.eks.id
+  description       = "Allow all traffic from VPC"
+}
+
+resource "aws_security_group_rule" "eks_self" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+  security_group_id = aws_security_group.eks.id
+  description       = "Allow all traffic from same security group"
 }
 
 resource "aws_iam_role" "eks" {

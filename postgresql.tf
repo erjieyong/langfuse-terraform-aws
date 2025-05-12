@@ -14,7 +14,9 @@ resource "aws_security_group" "postgres" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    # Only allow outbound traffic within the VPC
+    cidr_blocks = [module.vpc.vpc_cidr_block]
+    description = "Allow all outbound traffic within the VPC"
   }
 
   tags = {
@@ -46,7 +48,7 @@ resource "aws_rds_cluster" "postgres" {
   cluster_identifier           = "${var.name}-postgres"
   engine                       = "aurora-postgresql"
   engine_mode                  = "provisioned"
-  engine_version               = "15.5"
+  engine_version               = "15.10"
   database_name                = "langfuse"
   master_username              = "langfuse"
   master_password              = random_password.postgres_password.result
