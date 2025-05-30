@@ -11,6 +11,7 @@ resource "aws_s3_bucket" "langfuse" {
     Name    = "${local.bucket_prefix}-${var.name}"
     Domain  = var.domain
     Service = "langfuse"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 

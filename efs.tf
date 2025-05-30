@@ -5,6 +5,7 @@ resource "aws_efs_file_system" "langfuse" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -39,6 +40,7 @@ resource "aws_security_group" "efs" {
 
   tags = {
     Name = "${local.tag_name} EFS"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -86,6 +88,7 @@ resource "aws_iam_policy" "efs" {
 
   tags = {
     Name = "${local.tag_name} EFS"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 

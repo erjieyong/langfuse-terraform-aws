@@ -24,6 +24,7 @@ resource "aws_iam_role" "aws_load_balancer_controller" {
 
   tags = {
     Name = "${local.tag_name} ALB"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -276,6 +277,7 @@ resource "aws_iam_policy" "aws_load_balancer_controller" {
 
   tags = {
     Name = "${local.tag_name} ALB"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 

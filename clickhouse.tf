@@ -29,6 +29,7 @@ resource "aws_efs_access_point" "clickhouse" {
 
   tags = {
     Name = "${local.tag_name} Clickhouse"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -53,6 +54,7 @@ resource "aws_efs_access_point" "zookeeper" {
 
   tags = {
     Name = "${local.tag_name} Zookeper"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 

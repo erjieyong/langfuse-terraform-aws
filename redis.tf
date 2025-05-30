@@ -21,6 +21,7 @@ resource "aws_security_group" "redis" {
 
   tags = {
     Name = "${local.tag_name} Redis"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -76,5 +77,6 @@ resource "aws_elasticache_replication_group" "redis" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }

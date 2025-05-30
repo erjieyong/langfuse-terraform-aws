@@ -5,6 +5,7 @@ resource "aws_acm_certificate" "cert" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 
   lifecycle {
@@ -18,6 +19,7 @@ resource "aws_route53_zone" "zone" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -51,6 +53,7 @@ data "aws_lb" "ingress" {
     "elbv2.k8s.aws/cluster"    = var.name
     "ingress.k8s.aws/stack"    = "langfuse/langfuse"
     "ingress.k8s.aws/resource" = "LoadBalancer"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 
   depends_on = [

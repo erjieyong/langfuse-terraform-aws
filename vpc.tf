@@ -43,6 +43,7 @@ module "vpc" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -58,6 +59,7 @@ resource "aws_vpc_endpoint" "sts" {
 
   tags = {
     Name = "${local.tag_name} STS VPC Endpoint"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -69,6 +71,7 @@ resource "aws_vpc_endpoint" "s3" {
 
   tags = {
     Name = "${local.tag_name} S3 VPC Endpoint"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -87,5 +90,6 @@ resource "aws_security_group" "vpc_endpoints" {
 
   tags = {
     Name = "${local.tag_name} VPC Endpoints"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 } 

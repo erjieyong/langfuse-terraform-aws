@@ -18,6 +18,7 @@ resource "aws_eks_cluster" "langfuse" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 
   depends_on = [
@@ -35,6 +36,7 @@ resource "aws_iam_openid_connect_provider" "eks" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -62,6 +64,7 @@ resource "aws_iam_role" "fargate" {
 
   tags = {
     Name = "${local.tag_name} Fargate"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -85,6 +88,7 @@ resource "aws_eks_fargate_profile" "namespaces" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -95,6 +99,7 @@ resource "aws_security_group" "eks" {
 
   tags = {
     Name = "${local.tag_name} EKS"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -191,6 +196,7 @@ resource "aws_iam_role" "eks" {
 
   tags = {
     Name = "${local.tag_name} EKS"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 

@@ -21,6 +21,7 @@ resource "aws_security_group" "postgres" {
 
   tags = {
     Name = "${local.tag_name} Postgres"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -41,6 +42,7 @@ resource "aws_db_subnet_group" "postgres" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -67,6 +69,7 @@ resource "aws_rds_cluster" "postgres" {
 
   tags = {
     Name = local.tag_name
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
 
@@ -90,5 +93,6 @@ resource "aws_rds_cluster_instance" "postgres" {
 
   tags = {
     Name = "${local.tag_name} ${count.index + 1}"
+    group = "lta-cc-sandbox-aidp-aid"
   }
 }
