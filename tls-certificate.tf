@@ -53,7 +53,7 @@ data "aws_lb" "ingress" {
     "elbv2.k8s.aws/cluster"    = var.name
     "ingress.k8s.aws/stack"    = "langfuse/langfuse"
     "ingress.k8s.aws/resource" = "LoadBalancer"
-    group = "lta-cc-sandbox-aidp-aid"
+    "group" = "lta-cc-sandbox-aidp-aid"
   }
 
   depends_on = [
