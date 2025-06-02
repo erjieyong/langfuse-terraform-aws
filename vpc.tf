@@ -93,3 +93,28 @@ resource "aws_security_group" "vpc_endpoints" {
     group = "lta-cc-sandbox-aidp-aid"
   }
 } 
+
+# search for the default load balancer security group that was created
+data "aws_security_group" "lbc_backend_sg" {
+  filter {
+    name   = "tag:elbv2.k8s.aws/cluster"
+    values = [var.name] # Assuming var.name is your EKS cluster name
+  }
+  filter {
+    name   = "tag:elbv2.k8s.aws/resource"
+    values = ["backend-sg"]
+  }
+}
+
+# edit the egress rule for the security group
+resource "aws_security_group_rule" "lbc_backend_sg_outbound_vpc" {
+  # count = data.aws_security_group.lbc_backend_sg.id != "" ? 1 : 0 # Ensure SG is found
+
+  type              = "egress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [module.vpc.vpc_cidr_block]
+  security_group_id = data.aws_security_group.lbc_backend_sg.id
+  description       = "Allow all outbound TCP to VPC (Terraform managed - LBC SG)"
+}
