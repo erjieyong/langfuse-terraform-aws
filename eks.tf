@@ -92,6 +92,79 @@ resource "aws_eks_fargate_profile" "namespaces" {
   }
 }
 
+# for the default security group
+# Fetch the cluster’s computed SG ID
+data "aws_eks_cluster" "langfuse" {
+  name = aws_eks_cluster.langfuse.name
+}
+
+# 1 Allow HTTPS outbound to all IPv4
+resource "aws_security_group_rule" "default_eks_egress_https_all_ipv4" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id
+  description       = "Allow HTTPS outbound to all IPv4"
+}
+
+# 2 Allow HTTP outbound to all IPv4
+resource "aws_security_group_rule" "default_eks_egress_http_all_ipv4" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id
+  description       = "Allow HTTP outbound to all IPv4"
+}
+
+# 3 Allow all traffic to its own Cluster security group
+resource "aws_security_group_rule" "default_eks_egress_self" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1" # All protocols
+  source_security_group_id = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id # Allows traffic to itself
+  security_group_id        = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id
+  description              = "Allow all outbound traffic to self (cluster SG)"
+}
+
+# 4 Allow all traffic to its own vpc
+resource "aws_security_group_rule" "default_eks_egress_self_vpc" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 65535
+  protocol                 = "tcp"
+  cidr_blocks              = [module.vpc.vpc_cidr_block]
+  security_group_id        = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id
+  description              = "Allow all outbound traffic to self vpc"
+}
+
+
+resource "aws_security_group_rule" "default_eks_vpc" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  cidr_blocks       = [module.vpc.vpc_cidr_block]
+  security_group_id = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id
+  description       = "Allow all traffic from VPC"
+}
+
+resource "aws_security_group_rule" "default_eks_self" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  self              = true
+  security_group_id = data.aws_eks_cluster.langfuse.vpc_config[0].cluster_security_group_id
+  description       = "Allow all traffic from same security group"
+}
+
+
+# for additional security group
 resource "aws_security_group" "eks" {
   name        = "${var.name}-eks"
   description = "Security group for Langfuse EKS cluster"
