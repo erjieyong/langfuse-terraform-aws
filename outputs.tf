@@ -24,3 +24,23 @@ output "route53_nameservers" {
   description = "Nameserver for the Route53 zone"
   value       = aws_route53_zone.zone.name_servers
 }
+
+output "private_subnet_ids" {
+  description = "Private subnet IDs from the VPC module"
+  value       = module.vpc.private_subnets
+}
+
+output "public_subnet_ids" {
+  description = "Public subnet IDs from the VPC module"
+  value       = module.vpc.public_subnets
+}
+
+output "bucket_name" {
+  description = "Name of the S3 bucket for Langfuse"
+  value       = aws_s3_bucket.langfuse.bucket
+}
+
+output "bucket_id" {
+  description = "ID of the S3 bucket for Langfuse"
+  value       = aws_s3_bucket.langfuse.id
+}

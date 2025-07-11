@@ -50,7 +50,7 @@ resource "aws_rds_cluster" "postgres" {
   cluster_identifier           = "${var.name}-postgres"
   engine                       = "aurora-postgresql"
   engine_mode                  = "provisioned"
-  engine_version               = "15.10"
+  engine_version               = var.postgres_version
   database_name                = "langfuse"
   master_username              = "langfuse"
   master_password              = random_password.postgres_password.result

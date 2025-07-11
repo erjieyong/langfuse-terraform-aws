@@ -45,6 +45,12 @@ variable "postgres_max_capacity" {
   default     = 2.0 # Higher default for production readiness
 }
 
+variable "postgres_version" {
+  description = "PostgreSQL engine version to use"
+  type        = string
+  default     = "15.10"
+}
+
 variable "cache_node_type" {
   description = "ElastiCache node type"
   type        = string
@@ -75,6 +81,73 @@ variable "fargate_profile_namespaces" {
 
 variable "use_single_nat_gateway" {
   description = "To use a single NAT Gateway (cheaper), or one per AZ (more resilient)"
+  type        = bool
+  default     = false
+}
+
+variable "langfuse_helm_chart_version" {
+  description = "Version of the Langfuse Helm chart to deploy"
+  type        = string
+  default     = "1.2.15"
+}
+
+# Resource configuration variables
+variable "langfuse_cpu" {
+  description = "CPU allocation for Langfuse containers"
+  type        = string
+  default     = "2"
+}
+
+variable "langfuse_memory" {
+  description = "Memory allocation for Langfuse containers"
+  type        = string
+  default     = "4Gi"
+}
+
+variable "clickhouse_cpu" {
+  description = "CPU allocation for ClickHouse containers"
+  type        = string
+  default     = "2"
+}
+
+variable "clickhouse_memory" {
+  description = "Memory allocation for ClickHouse containers"
+  type        = string
+  default     = "8Gi"
+}
+
+variable "clickhouse_keeper_cpu" {
+  description = "CPU allocation for ClickHouse Keeper containers"
+  type        = string
+  default     = "1"
+}
+
+variable "clickhouse_keeper_memory" {
+  description = "Memory allocation for ClickHouse Keeper containers"
+  type        = string
+  default     = "2Gi"
+}
+
+variable "alb_scheme" {
+  description = "Scheme for the ALB (internal or internet-facing)"
+  type        = string
+  default     = "internet-facing"
+}
+
+variable "ingress_inbound_cidrs" {
+  description = "List of CIDR blocks allowed to access the ingress"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "redis_at_rest_encryption" {
+  description = "Whether at-rest encryption is enabled for the Redis cluster"
+  type        = bool
+  default     = false
+}
+
+variable "redis_multi_az" {
+  description = "Whether Multi-AZ is enabled for the Redis cluster"
   type        = bool
   default     = false
 }

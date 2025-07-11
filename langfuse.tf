@@ -1,5 +1,6 @@
 locals {
-  langfuse_values = <<EOT
+  inbound_cidrs_csv = join(",", var.ingress_inbound_cidrs)
+  langfuse_values   = <<EOT
 global:
   defaultStorageClass: efs
 langfuse:
@@ -16,6 +17,14 @@ langfuse:
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: ${aws_iam_role.langfuse_irsa.arn}
+  # Resource configuration for production workloads
+  resources:
+    limits:
+      cpu: "${var.langfuse_cpu}"
+      memory: "${var.langfuse_memory}"
+    requests:
+      cpu: "${var.langfuse_cpu}"
+      memory: "${var.langfuse_memory}"
   # The Web container needs slightly increased initial grace period on Fargate
   web:
     livenessProbe:
@@ -35,19 +44,31 @@ clickhouse:
   auth:
     existingSecret: langfuse
     existingSecretKey: clickhouse-password
+  # Resource configuration for ClickHouse containers
   resources:
-    requests:
-      cpu: "1"
-      memory: "3Gi"
     limits:
-      cpu: "8"
-      memory: "16Gi"
+      cpu: "${var.clickhouse_cpu}"
+      memory: "${var.clickhouse_memory}"
+    requests:
+      cpu: "${var.clickhouse_cpu}"
+      memory: "${var.clickhouse_memory}"
+  # Resource configuration for ClickHouse Keeper
+  zookeeper:
+    resources:
+      limits:
+        cpu: "${var.clickhouse_keeper_cpu}"
+        memory: "${var.clickhouse_keeper_memory}"
+      requests:
+        cpu: "${var.clickhouse_keeper_cpu}"
+        memory: "${var.clickhouse_keeper_memory}"
 redis:
   deploy: false
   host: ${aws_elasticache_replication_group.redis.primary_endpoint_address}
   auth:
     existingSecret: langfuse
     existingSecretPasswordKey: redis-password
+  tls:
+    enabled: true
 s3:
   deploy: false
   bucket: ${aws_s3_bucket.langfuse.id}
@@ -60,16 +81,17 @@ s3:
   mediaUpload:
     prefix: "media/"
 EOT
-  ingress_values  = <<EOT
+  ingress_values    = <<EOT
 langfuse:
   ingress:
     enabled: true
     className: alb
     annotations:
-      alb.ingress.kubernetes.io/scheme: internet-facing
-      alb.ingress.kubernetes.io/target-type: 'ip'
       alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/scheme: ${var.alb_scheme}
+      alb.ingress.kubernetes.io/target-type: 'ip'
       alb.ingress.kubernetes.io/ssl-redirect: '443'
+      alb.ingress.kubernetes.io/inbound-cidrs: ${local.inbound_cidrs_csv}
     hosts:
     - host: ${var.domain}
       paths:
@@ -126,7 +148,7 @@ resource "kubernetes_secret" "langfuse" {
 resource "helm_release" "langfuse" {
   name             = "langfuse"
   repository       = "https://langfuse.github.io/langfuse-k8s"
-  version          = "1.1.0"
+  version          = var.langfuse_helm_chart_version
   chart            = "langfuse"
   namespace        = "langfuse"
   create_namespace = true
@@ -134,6 +156,7 @@ resource "helm_release" "langfuse" {
   values = [
     local.langfuse_values,
     local.ingress_values,
+    local.encryption_values,
   ]
 
   depends_on = [
