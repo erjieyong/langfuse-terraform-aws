@@ -152,6 +152,7 @@ resource "helm_release" "langfuse" {
   chart            = "langfuse"
   namespace        = "langfuse"
   create_namespace = true
+  timeout = 900 # in seconds (15 min), increase as needed
 
   values = [
     local.langfuse_values,

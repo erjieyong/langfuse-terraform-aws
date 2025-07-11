@@ -69,6 +69,7 @@ resource "aws_elasticache_replication_group" "redis" {
   engine_version             = "7.0"
   auth_token                 = random_password.redis_password.result
   transit_encryption_enabled = true
+  transit_encryption_mode    = "required"
   at_rest_encryption_enabled = var.redis_at_rest_encryption
   multi_az_enabled           = var.redis_multi_az
 
